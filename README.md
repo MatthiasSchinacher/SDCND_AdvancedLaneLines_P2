@@ -14,10 +14,10 @@ video (see "project_video.mp4" in the folder "output_videos").
 The parameters for the solution are those from "params_05.ini".
 
 If you want to run the script, try the command line:
- python single_image_pipeline.py params_05.ini
+    python single_image_pipeline.py params_05.ini
 
 Note: you must have the environment set up as required by
 Udacity's Self Driving Car Nano Degree.
 
 You can also process a video, example (30 second clip):
- python clip_pipeline.py some-file.mp4 params_05.ini 30
+    python clip_pipeline.py some-file.mp4 params_05.ini 30
