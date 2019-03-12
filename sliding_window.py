@@ -30,7 +30,7 @@ def find_lane_pixels(warped,xsplit=0.5,nwindows=15,margin=100,minpix=30,leftstar
     tmp = np.argmax(h[:m])
     if tmp > 0:
         if left0 > 0:
-            left0 = int(0.7*float(left0) + 0.3*float(tmp))
+            left0 = int(0.3*float(left0) + 0.7*float(tmp))
         else:
             left0 = tmp
     if left0 == 0:
@@ -40,7 +40,7 @@ def find_lane_pixels(warped,xsplit=0.5,nwindows=15,margin=100,minpix=30,leftstar
     tmp = np.argmax(h[m:])
     if tmp > 0:
         if right0 > 0:
-            right0 = int(0.7*float(right0) + 0.3*float(m+tmp))
+            right0 = int(0.3*float(right0) + 0.7*float(m+tmp))
         else:
             right0 = m+tmp
     if right0 == 0:

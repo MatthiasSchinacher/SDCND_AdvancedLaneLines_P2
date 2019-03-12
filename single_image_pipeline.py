@@ -106,13 +106,16 @@ class Configuration():
 
 
 # the actual pipeline
-def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart=0,fill_lane=False,save_flag=False,prev_left_fit=None,prev_right_fit=None):
+def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart=0,fill_lane=False,save_flag=False,prev_left_fit=None,prev_right_fit=None,save_all=False):
     #print('... processing imgage')
     original_img = image
     #print('mtx, dist, blur_kernel:',c.mtx,c.dist,c.blur_kernel)
     if show_flag:
         cv2.imshow('img',image)
         cv2.waitKey(500)
+    if save_all:
+        ofname = image_name.replace('.jpg','-01.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,image)
 
 # undistort
     img = cv2.undistort(image, c.mtx, c.dist, None, c.mtx)
@@ -120,6 +123,9 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         #print('undistorted image; shape: ',type(img.shape),img.shape)
         cv2.imshow('img',img)
         cv2.waitKey(500)
+    if save_all:
+        ofname = image_name.replace('.jpg','-U.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,img)
 
 ## greyscale
 #    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -134,7 +140,10 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
     if show_flag:
         print('S- channel image; shape: ',type(S.shape),S.shape)
         cv2.imshow('img',S)
-        cv2.waitKey(500)
+        cv2.waitKey(1000)
+    if save_all:
+        ofname = image_name.replace('.jpg','-S.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,S)
 
 # thresholding the S channel
     if c.thresh_S_high > 0:
@@ -144,7 +153,10 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         if show_flag:
             print('thresholded S- channel image; shape: ',type(img.shape),img.shape)
             cv2.imshow('img',img)
-            cv2.waitKey(500)
+            cv2.waitKey(1000)
+        if save_all:
+            ofname = image_name.replace('.jpg','-S2.jpg').replace('./test_images/','')
+            cv2.imwrite(ofname,img)
     else:
         img = S
 
@@ -155,6 +167,9 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
             print('blurred image; shape: ',type(img.shape),img.shape)
             cv2.imshow('img',img)
             cv2.waitKey(500)
+        if save_all:
+            ofname = image_name.replace('.jpg','-B.jpg').replace('./test_images/','')
+            cv2.imwrite(ofname,img)
 
 # sobel
     sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=c.sobel_kernel_m)
@@ -170,7 +185,10 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
     if show_flag:
         print('thresholded sobel image; shape: ',type(img.shape),img.shape)
         cv2.imshow('img',img)
-        cv2.waitKey(500)
+        cv2.waitKey(1000)
+    if save_all:
+        ofname = image_name.replace('.jpg','-SOB.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,img)
 
 # canny
     if c.canny_high > 0:
@@ -178,7 +196,11 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         if show_flag:
             print('canny image; shape: ',type(img.shape),img.shape)
             cv2.imshow('img',img)
-            cv2.waitKey(500)
+            cv2.waitKey(1000)
+        if save_all:
+            ofname = image_name.replace('.jpg','-C.jpg').replace('./test_images/','')
+            cv2.imwrite(ofname,img)
+            #return
 
 # mask
     xmin = 0
@@ -187,12 +209,12 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
     ymax = img.shape[0]
 
     xstart = int(float(xmin) + 2.0 * float(xmax - xmin) / 17.0)
-    x0 = int(float(xmin) + 3.0 * float(xmax - xmin) / 16.0)
+    x0 = int(float(xmin) + 4.0 * float(xmax - xmin) / 16.0)
     x1 = int(float(xmin) + 18.0 * float(xmax - xmin) / 39.0)
     x2 = int(float(xmin) + 21.0 * float(xmax - xmin) / 39.0)
-    x3 = int(float(xmin) + 13.0 * float(xmax - xmin) / 16.0)
+    x3 = int(float(xmin) + 12.0 * float(xmax - xmin) / 16.0)
     xend = int(float(xmin) + 15.0 * float(xmax - xmin) / 17.0)
-    y0 = int(float(ymin) + 14.0 * float(ymax - ymin) / 20.0)
+    y0 = int(float(ymin) + 16.0 * float(ymax - ymin) / 20.0)
     y1 = int(float(ymin) + 19.0 * float(ymax - ymin) / 40.0)
     ystart = int(float(ymax) - 5.0 * float(ymax - ymin) / 37.0)
     verts = np.array([[(xstart,ystart),(x0,y0),(x1, y1),(x2, y1),(x3,y0),(xend,ystart)]], dtype=np.int32)
@@ -212,6 +234,9 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         print('masked image; shape: ',type(img.shape),img.shape)
         cv2.imshow('img',img)
         cv2.waitKey(500)
+    if save_all:
+        ofname = image_name.replace('.jpg','-M.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,img)
 
 # hough lines
     lines = cv2.HoughLinesP(img, c.rho, c.theta, c.threshold, np.array([]), minLineLength=c.min_line_len, maxLineGap=c.max_line_gap)
@@ -225,6 +250,9 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         print('hough lines image; shape: ',type(img.shape),img.shape)
         cv2.imshow('img',img)
         cv2.waitKey(500)
+    if save_all:
+        ofname = image_name.replace('.jpg','-H.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,img)
 
 # transformed
     img = cv2.warpPerspective(img, c.M, img.shape[::-1][1:3]) # only if we have 3 channels
@@ -232,11 +260,14 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         print('warped image; shape: ',type(img.shape),img.shape)
         cv2.imshow('img',img)
         cv2.waitKey(500)
+    if save_all:
+        ofname = image_name.replace('.jpg','-W.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,img)
 
 # sliding window search
     lstart = leftstart
     rstart = rightstart
-    leftx, lefty, rightx, righty, img, lstart, rstart = sw.find_lane_pixels(img,xsplit=0.4,nwindows=11,margin=60,minpix=10,leftstart=lstart,rightstart=rstart)
+    leftx, lefty, rightx, righty, img, lstart, rstart = sw.find_lane_pixels(img,xsplit=0.4,nwindows=15,margin=80,minpix=10,leftstart=lstart,rightstart=rstart)
 
 # we initialize our fits with the fits from last time
     left_fit = prev_left_fit
@@ -245,7 +276,7 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         if left_fit is None:
             left_fit = np.polyfit(lefty,leftx,2)
         else:
-            left_fit = (0.7* left_fit) + (0.3* np.polyfit(lefty,leftx,2))
+            left_fit = (0.3* left_fit) + (0.7* np.polyfit(lefty,leftx,2))
     elif left_fit is None: # special case, where we do not have a fit from prevoius AND we can't compute one now
         left_fit = np.array([0.0,0.0,0.2*float(img.shape[1])])
 
@@ -253,7 +284,7 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         if right_fit is None:
             right_fit = np.polyfit(righty,rightx,2)
         else:
-            right_fit = (0.7* right_fit) + (0.3* np.polyfit(righty,rightx,2))
+            right_fit = (0.3* right_fit) + (0.7* np.polyfit(righty,rightx,2))
     elif right_fit is None: # special case, where we do not have a fit from prevoius AND we can't compute one now
         right_fit = np.array([0.0,0.0,0.7*float(img.shape[1])])
 
@@ -277,6 +308,9 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
         print('sliding windows; shape: ',type(img.shape),img.shape)
         cv2.imshow('img',img)
         cv2.waitKey(1000)
+    if save_all:
+        ofname = image_name.replace('.jpg','-SW.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,img)
 
     if show_flag or save_flag:# or True:
         revimg = cv2.warpPerspective(img, c.Mrev, img.shape[::-1][1:3]) # only if we have 3 channels
@@ -323,22 +357,32 @@ def process_image(c,image,image_name=None,show_flag=False,leftstart=0,rightstart
             ofname = image_name.replace('.jpg','_L.jpg').replace('/test_images/','/output_images/')
             cv2.imwrite(ofname,img)
 
+    if save_all:
+        ofname = image_name.replace('.jpg','-final.jpg').replace('./test_images/','')
+        cv2.imwrite(ofname,img)
+
     return lstart, rstart, left_fit, right_fit, img
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         print('usage:')
-        print('   python {} parameter-file-name'.format(sys.argv[0]))
+        print('   python {} parameter-file-name [test-image]'.format(sys.argv[0]))
         quit()
 
     c = Configuration()
     c.load_config(sys.argv[1])
 
-    images = glob.glob('./test_images/*.jpg')
-    for fname in images:
+    if len(sys.argv) > 2:
+        fname = './test_images/' + sys.argv[2]
         img = cv2.imread(fname)
         print('original image ("' + fname + '"); shape: ',type(img.shape),img.shape)
-        process_image(c,img,image_name=fname,show_flag=True,fill_lane=True,save_flag=True)
+        process_image(c,img,image_name=fname,show_flag=True,fill_lane=True,save_flag=True,save_all=True)
+    else:
+        images = glob.glob('./test_images/*.jpg')
+        for fname in images:
+            img = cv2.imread(fname)
+            print('original image ("' + fname + '"); shape: ',type(img.shape),img.shape)
+            process_image(c,img,image_name=fname,show_flag=True,fill_lane=True,save_flag=True)
 
     cv2.waitKey(5000)
     cv2.destroyAllWindows()

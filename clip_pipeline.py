@@ -13,10 +13,14 @@ from moviepy.editor import VideoFileClip
 import sliding_window as sw
 import single_image_pipeline as sip
 
-if len(sys.argv) != 3:
+if len(sys.argv) < 3:
     print('usage:')
-    print('   python {} clip-name parameter-file-name'.format(sys.argv[0]))
+    print('   python {} clip-name parameter-file-name [length]'.format(sys.argv[0]))
     quit()
+
+l = -1 # default, so we recognize, we want the full length
+if len(sys.argv) > 3:
+    l = int(sys.argv[3])
 
 c = sip.Configuration()
 c.load_config(sys.argv[2])
@@ -36,6 +40,11 @@ outclipname = './output_videos/' + clipname
 
 print('CLIP:',clipname,' -> ',outclipname,' |',sys.argv[2])
 
-clip = VideoFileClip(clipname).subclip(0,10)
+clip = None
+if l > 0:
+    clip = VideoFileClip(clipname).subclip(0,l)
+else:
+    clip = VideoFileClip(clipname)
+
 oclip = clip.fl_image(process_image)
 oclip.write_videofile(outclipname, audio=False)
