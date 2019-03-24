@@ -4,15 +4,16 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import cv2
 
-def find_lane_pixels(warped,xsplit=0.5,nwindows=15,margin=100,minpix=30,leftstart=0,rightstart=0):
+def find_lane_pixels(warped,xsplit=0.5,nwindows=11,margin=100,minpix=10,leftstart=0,rightstart=0):
     # check, if this is really binary 1-based
     img = warped
     #print('DEBUG-A img',type(img),img)
     #if np.max(img) > 1:
     #    img = img/255
 
-    # as a strating point, we do a hist. for the bottom third
-    h = np.sum(img[2*img.shape[0]//3:,:], axis=0)
+    # as a strating point, we do a hist.
+    #h = np.sum(img[2*img.shape[0]//2:,:], axis=0)
+    h = np.sum(img, axis=0)
 
     out_img = None
     if len(img.shape)<3:
@@ -64,17 +65,26 @@ def find_lane_pixels(warped,xsplit=0.5,nwindows=15,margin=100,minpix=30,leftstar
 
     # looping through the windows
     for window in range(nwindows):
-        win_y_low = img.shape[0] - (window+1)*wh
-        win_y_high = img.shape[0] - window*wh
-        win_xleft_low = left - margin
-        win_xleft_high = left + margin
-        win_xright_low = right - margin
-        win_xright_high = right + margin
+        win_y_low = int(img.shape[0] - (window+1)*wh)
+        win_y_high = int(img.shape[0] - window*wh)
+        win_xleft_low = int(left - margin)
+        win_xleft_high = int(left + margin)
+        win_xright_low = int(right - margin)
+        win_xright_high = int(right + margin)
 
         # Draw the windows on the visualization image
         #print('DEBUG: ',type(out_img.shape),out_img.shape)
-        cv2.rectangle(out_img,(win_xleft_low,win_y_low), (win_xleft_high,win_y_high),(0,255,0), 2)
-        cv2.rectangle(out_img,(win_xright_low,win_y_low), (win_xright_high,win_y_high),(0,255,0), 2)
+        #print('DEBUG: ',win_xleft_low,win_y_low,win_xleft_high,win_y_high)
+        #cv2.rectangle(out_img,(win_xleft_low,win_y_low), (win_xleft_high,win_y_high),(0,255,0), 2)
+        #cv2.rectangle(out_img,(win_xright_low,win_y_low), (win_xright_high,win_y_high),(0,255,0), 2)
+        cv2.line(out_img, (win_xleft_low,win_y_low),(win_xleft_low,win_y_high),(0,255,0), 4)
+        cv2.line(out_img, (win_xleft_low,win_y_high),(win_xleft_high,win_y_high),(0,255,0), 4)
+        cv2.line(out_img, (win_xleft_high,win_y_high),(win_xleft_high,win_y_low),(0,255,0), 4)
+        cv2.line(out_img, (win_xleft_high,win_y_low),(win_xleft_low,win_y_low),(0,255,0), 4)
+        cv2.line(out_img, (win_xright_low,win_y_low),(win_xright_low,win_y_high),(0,255,0), 4)
+        cv2.line(out_img, (win_xright_low,win_y_high),(win_xright_high,win_y_high),(0,255,0), 4)
+        cv2.line(out_img, (win_xright_high,win_y_high),(win_xright_high,win_y_low),(0,255,0), 4)
+        cv2.line(out_img, (win_xright_high,win_y_low),(win_xright_low,win_y_low),(0,255,0), 4)
 
         good_left_inds = []
         good_right_inds = []

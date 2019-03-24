@@ -27,10 +27,14 @@ c.load_config(sys.argv[2])
 lstart=0
 rstart=0
 imgcnt=0
+left_fit = None
+right_fit = None
 
 def process_image(img):
-    global c,lstart,rstart,imgcnt
-    lstart, rstart, left_fit, right_fit, img = sip.process_image(c,img,image_name=None,show_flag=False,leftstart=lstart,rightstart=rstart,fill_lane=True,save_flag=False)
+    global c,lstart,rstart,imgcnt, left_fit, right_fit
+    #lstart, rstart, left_fit, right_fit, img = sip.process_image(c,img,image_name=None,show_flag=False,leftstart=lstart,rightstart=rstart,fill_lane=True,save_flag=False)
+    lstart, rstart, left_fit, right_fit, img = sip.process_image(c,img,image_name=None,show_flag=False,leftstart=lstart,rightstart=rstart,fill_lane=True,save_flag=False,prev_left_fit=left_fit,prev_right_fit=right_fit)
+    #lstart, rstart, left_fit, right_fit, img = sip.process_image(c,img,image_name=None,show_flag=False,leftstart=0,rightstart=0,fill_lane=True,save_flag=False)
     imgcnt += 1
     #print('image #',imgcnt)
     return img
